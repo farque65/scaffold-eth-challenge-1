@@ -10,7 +10,7 @@ contract ExampleExternalContract {
   }
 
   function ExampleExternalContractStake(uint256 amount) public payable {
-    balances[msg.sender] = balances[msg.sender] + amount;
+    balances[msg.sender] += amount;
   }
 
 }
