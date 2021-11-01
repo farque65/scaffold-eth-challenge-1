@@ -1,7 +1,8 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, List } from "antd";
+import { Alert, Button, Col, Menu, Row, List, Tabs } from "antd";
+import { BugOutlined, SmileOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
@@ -21,7 +22,6 @@ import {
 import { useEventListener } from "eth-hooks/events/useEventListener";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 // import Hints from "./Hints";
-import { ExampleUI, Hints, Subgraph } from "./views";
 
 import { useContractConfig } from "./hooks";
 import Portis from "@portis/web3";
@@ -132,19 +132,6 @@ const web3Modal = new Web3Modal({
         key: "pk_live_5A7C91B2FC585A17", // required
       },
     },
-    // torus: {
-    //   package: Torus,
-    //   options: {
-    //     networkParams: {
-    //       host: "https://localhost:8545", // optional
-    //       chainId: 1337, // optional
-    //       networkId: 1337 // optional
-    //     },
-    //     config: {
-    //       buildEnv: "development" // optional
-    //     },
-    //   },
-    // },
     "custom-walletlink": {
       display: {
         logo: "https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0",
@@ -281,9 +268,9 @@ function App(props) {
   let completeDisplay = "";
   if (complete) {
     completeDisplay = (
-      <div style={{ padding: 64, backgroundColor: "#eeffef", fontWeight: "bolder" }}>
+      <div style={{ padding: 40, backgroundColor: "#8d749e", fontWeight: "bolder", borderRadius: 25 }}>
         🚀 🎖 👩‍🚀 - Staking App triggered `ExampleExternalContract` -- 🎉 🍾 🎊
-        <Balance balance={exampleExternalContractBalance} fontSize={64} /> ETH staked!
+        <Balance balance={exampleExternalContractBalance} fontSize={100} /> ETH staked!
       </div>
     );
   }
@@ -492,7 +479,8 @@ function App(props) {
               }}
               to="/"
             >
-              Staker UI
+              <SmileOutlined />
+              Staker
             </Link>
           </Menu.Item>
           <Menu.Item key="/contracts">
@@ -502,94 +490,148 @@ function App(props) {
               }}
               to="/contracts"
             >
-              Debug Contracts
+              <BugOutlined /> Debug Contracts
             </Link>
           </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/">
-            {completeDisplay}
+            <div
+              style={{
+                border: "1px solid #444444",
+                padding: 20,
+                width: 600,
+                margin: "auto",
+                marginTop: 50,
+                borderRadius: 25,
+              }}
+            >
+              <Tabs defaultActiveKey="1" centered>
+                <Tabs.TabPane tab="Stake Now" key="1">
+                  {completeDisplay}
 
-            <div style={{ padding: 8, marginTop: 32 }}>
-              <div>Timeleft:</div>
-              {timeLeft && humanizeDuration(timeLeft.toNumber() * 1000)}
+                  <div
+                    style={{
+                      borderRadius: 25,
+                      backgroundColor: "#444444",
+                      border: "1px solid #444444",
+                      padding: 8,
+                      marginTop: 32,
+                      height: "auto",
+                    }}
+                  >
+                    <div style={{ color: "#bcbcbc" }}>Timeleft:</div>
+                    <div style={{ fontSize: 30 }}>{timeLeft && humanizeDuration(timeLeft.toNumber() * 1000)}</div>
+                  </div>
+
+                  <Row>
+                    <Col span={16}>
+                      <div
+                        style={{
+                          borderRadius: 25,
+                          backgroundColor: "#444444",
+                          border: "1px solid #444444",
+                          padding: 8,
+                          marginTop: 32,
+                          height: "auto",
+                          marginRight: 20,
+                        }}
+                      >
+                        <div style={{ color: "#bcbcbc" }}>Total staked:</div>
+                        <Balance balance={stakerContractBalance} fontSize={100} />
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div
+                        style={{
+                          borderRadius: 25,
+                          backgroundColor: "#444444",
+                          border: "1px solid #444444",
+                          padding: 8,
+                          marginTop: 32,
+                          height: "auto",
+                        }}
+                      >
+                        <div style={{ color: "#bcbcbc" }}>Threshold:</div>
+                        <Balance balance={threshold} fontSize={100} />
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <div
+                    style={{
+                      borderRadius: 25,
+                      backgroundColor: "#444444",
+                      border: "1px solid #444444",
+                      padding: 8,
+                      marginTop: 32,
+                      height: "auto",
+                    }}
+                  >
+                    <div style={{ color: "#bcbcbc" }}>You staked:</div>
+                    <Balance balance={balanceStaked} fontSize={100} />
+                  </div>
+
+                  <Row style={{ padding: 10, marginTop: 20, marginBottom: 20 }}>
+                    <Col span={8}>
+                      <Button
+                        size={"large"}
+                        type={"default"}
+                        onClick={() => {
+                          tx(writeContracts.Staker.execute());
+                        }}
+                        style={{ borderRadius: 25, backgroundColor: "#990000", border: 0 }}
+                      >
+                        📡 Execute!
+                      </Button>
+                    </Col>
+                    <Col span={8}>
+                      <Button
+                        size={"large"}
+                        type={"default"}
+                        onClick={() => {
+                          tx(writeContracts.Staker.withdraw());
+                        }}
+                        style={{ borderRadius: 25, backgroundColor: "#5e4700", border: 0 }}
+                      >
+                        🏧 Withdraw
+                      </Button>
+                    </Col>
+                    <Col span={8}>
+                      <Button
+                        size={"large"}
+                        type={balanceStaked ? "success" : "primary"}
+                        onClick={() => {
+                          tx(writeContracts.Staker.stake({ value: ethers.utils.parseEther("0.5") }));
+                        }}
+                        style={{ borderRadius: 25, backgroundColor: "#134e41", border: 0, fontSize: 15 }}
+                      >
+                        🥩 Stake 0.5 ether!
+                      </Button>
+                    </Col>
+                  </Row>
+                </Tabs.TabPane>
+                <Tabs.TabPane tab="Stake Events" key="2">
+                  <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
+                    <List
+                      dataSource={stakeEvents}
+                      renderItem={item => {
+                        return (
+                          <List.Item
+                            key={item.blockNumber}
+                            style={{ borderRadius: 25, backgroundColor: "#444444", border: 0, marginTop: 20 }}
+                          >
+                            <Address value={item.args[0]} ensProvider={mainnetProvider} fontSize={16} /> =>
+                            <Balance balance={item.args[1]} />
+                          </List.Item>
+                        );
+                      }}
+                    />
+                  </div>
+                </Tabs.TabPane>
+              </Tabs>
             </div>
-
-            <div style={{ padding: 8 }}>
-              <div>Total staked:</div>
-              <Balance balance={stakerContractBalance} fontSize={64} />/<Balance balance={threshold} fontSize={64} />
-            </div>
-
-            <div style={{ padding: 8 }}>
-              <div>You staked:</div>
-              <Balance balance={balanceStaked} fontSize={64} />
-            </div>
-
-            <div style={{ padding: 8 }}>
-              <Button
-                type={"default"}
-                onClick={() => {
-                  tx(writeContracts.Staker.execute());
-                }}
-              >
-                📡 Execute!
-              </Button>
-            </div>
-
-            <div style={{ padding: 8 }}>
-              <Button
-                type={"default"}
-                onClick={() => {
-                  tx(writeContracts.Staker.withdraw());
-                }}
-              >
-                🏧 Withdraw
-              </Button>
-            </div>
-
-            <div style={{ padding: 8 }}>
-              <Button
-                type={balanceStaked ? "success" : "primary"}
-                onClick={() => {
-                  tx(writeContracts.Staker.stake({ value: ethers.utils.parseEther("0.5") }));
-                }}
-              >
-                🥩 Stake 0.5 ether!
-              </Button>
-            </div>
-
-            {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-            <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
-              <div>Stake Events:</div>
-              <List
-                dataSource={stakeEvents}
-                renderItem={item => {
-                  return (
-                    <List.Item key={item.blockNumber}>
-                      <Address value={item.args[0]} ensProvider={mainnetProvider} fontSize={16} /> =>
-                      <Balance balance={item.args[1]} />
-                    </List.Item>
-                  );
-                }}
-              />
-            </div>
-
-            {/* uncomment for a second contract:
-            <Contract
-              name="SecondContract"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-              contractConfig={contractConfig}
-            />
-            */}
           </Route>
           <Route path="/contracts">
             <Contract
@@ -632,7 +674,8 @@ function App(props) {
 
       <div style={{ marginTop: 32, opacity: 0.5 }}>
         {/* Add your address here */}
-        Created by <Address value={"Your...address"} ensProvider={mainnetProvider} fontSize={16} />
+        Created by{" "}
+        <Address value={"0xec0a73cc9b682695959611727da874afd8440c21"} ensProvider={mainnetProvider} fontSize={16} />
       </div>
 
       <div style={{ marginTop: 32, opacity: 0.5 }}>
